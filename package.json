@@ -31,7 +31,7 @@
     "prepack": "bun run build",
     "prepare": "simple-git-hooks",
     "release": "bumpp && bun publish --access public",
-    "start": "tsx src/cli.ts",
+    "start": "bun run src/main.ts",
     "test": "vitest",
     "typecheck": "tsc --noEmit"
   },
@@ -42,19 +42,21 @@
     "*": "bun run lint --fix"
   },
   "dependencies": {
-    "citty": "^0.1.6"
+    "citty": "^0.1.6",
+    "effect": "^3.16.9",
+    "ink": "^6.0.0",
+    "react": "^19.1.0"
   },
   "devDependencies": {
     "@echristian/eslint-config": "^0.0.43",
     "@types/node": "^24.0.3",
+    "@types/react": "^19.1.8",
     "bumpp": "^10.2.0",
     "eslint": "^9.29.0",
-    "jiti": "^2.4.2",
     "lint-staged": "^16.1.2",
     "prettier-plugin-packagejson": "^2.5.15",
     "simple-git-hooks": "^2.13.0",
     "tsup": "^8.5.0",
-    "tsx": "^4.20.3",
     "typescript": "^5.8.3",
     "vitest": "^3.2.4"
   },
