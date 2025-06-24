@@ -28,18 +28,18 @@
   "scripts": {
     "build": "tsup",
     "lint": "eslint .",
-    "prepack": "pnpm run build",
+    "prepack": "bun run build",
     "prepare": "simple-git-hooks",
-    "release": "bumpp && pnpm publish --access public",
+    "release": "bumpp && bun publish --access public",
     "start": "tsx src/cli.ts",
     "test": "vitest",
     "typecheck": "tsc --noEmit"
   },
   "simple-git-hooks": {
-    "pre-commit": "pnpm exec lint-staged"
+    "pre-commit": "bunx lint-staged"
   },
   "lint-staged": {
-    "*": "pnpm run lint --fix"
+    "*": "bun run lint --fix"
   },
   "dependencies": {
     "citty": "^0.1.6"
