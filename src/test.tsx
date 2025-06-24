@@ -1,4 +1,4 @@
-import { render, Text } from "ink"
+import { Box, render, Text } from "ink"
 import { useEffect, useState } from "react"
 
 const Counter = () => {
@@ -15,7 +15,11 @@ const Counter = () => {
     }
   }, [])
 
-  return <Text color="green">{counter} tests passed</Text>
+  return (
+    <Box height={10}>
+      <Text color="green">{counter} tests passed</Text>
+    </Box>
+  )
 }
 
 export const renderApp = () => {
