@@ -1,4 +1,3 @@
-import ignore from "ignore"
 import { Box, render, Text } from "ink"
 
 import { useStdoutDimensions } from "./lib/hooks"
@@ -16,5 +15,3 @@ const Counter = () => {
 export const renderApp = () => {
   render(<Counter />)
 }
-
-ignore()

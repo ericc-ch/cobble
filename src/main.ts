@@ -1,10 +1,14 @@
 import { renderApp } from "./app"
-import { isGitDirectory } from "./lib/utils"
+import { isGit, listFiles } from "./lib/git"
 
 const home = process.env.HOME ?? "~"
 const cwd = process.cwd()
 
-console.log(home, isGitDirectory(home))
-console.log(cwd, isGitDirectory(cwd))
+console.log(home, await isGit(home))
+console.log(cwd, await isGit(cwd))
+
+if (await isGit(cwd)) {
+  console.log(await listFiles(cwd))
+}
 
 renderApp()
