@@ -2,16 +2,23 @@ import { Box, render, Text } from "ink"
 
 import { useStdoutDimensions } from "./lib/hooks"
 
-const Counter = () => {
+export interface AppProps {
+  isGit: boolean
+}
+
+const App = (props: AppProps) => {
   const dimensions = useStdoutDimensions()
 
   return (
     <Box borderLeft={false} borderRight={false} borderStyle="single">
-      <Text>{JSON.stringify(dimensions)}</Text>
+      <Box flexDirection="column">
+        <Text>{JSON.stringify(props)}</Text>
+        <Text>{JSON.stringify(dimensions)}</Text>
+      </Box>
     </Box>
   )
 }
 
-export const renderApp = () => {
-  render(<Counter />)
+export const renderApp = (props: AppProps) => {
+  render(<App {...props} />)
 }

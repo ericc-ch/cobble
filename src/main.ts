@@ -11,4 +11,6 @@ if (await isGit(cwd)) {
   console.log(await listFiles(cwd))
 }
 
-renderApp()
+renderApp({
+  isGit: await isGit(cwd),
+})
