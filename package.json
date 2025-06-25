@@ -27,6 +27,7 @@
   ],
   "scripts": {
     "build": "tsup",
+    "dev": "bun run --watch src/main.ts",
     "lint": "eslint .",
     "prepack": "bun run build",
     "prepare": "simple-git-hooks",
@@ -44,8 +45,10 @@
   "dependencies": {
     "citty": "^0.1.6",
     "effect": "^3.16.9",
+    "ignore": "^7.0.5",
     "ink": "^6.0.0",
-    "react": "^19.1.0"
+    "react": "^19.1.0",
+    "tinyexec": "^1.0.1"
   },
   "devDependencies": {
     "@echristian/eslint-config": "^0.0.43",
