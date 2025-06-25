@@ -1,4 +1,4 @@
-import { Box, render, Text } from "ink"
+import { Box, render, Text, useInput } from "ink"
 
 import { useStdoutDimensions } from "./lib/hooks"
 
@@ -8,6 +8,10 @@ export interface AppProps {
 
 const App = (props: AppProps) => {
   const dimensions = useStdoutDimensions()
+
+  useInput((input) => {
+    console.log(input)
+  })
 
   return (
     <Box borderLeft={false} borderRight={false} borderStyle="single">
