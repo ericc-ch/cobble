@@ -32,7 +32,7 @@
     "prepack": "bun run build",
     "prepare": "simple-git-hooks",
     "release": "bumpp && bun publish --access public",
-    "start": "bun run src/main.ts",
+    "start": "bun run src/main.tsx",
     "test": "vitest",
     "typecheck": "tsc --noEmit"
   },
@@ -43,30 +43,28 @@
     "*": "bun run lint --fix"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.82.0",
+    "ansi-escapes": "^7.0.0",
     "citty": "^0.1.6",
-    "ink": "^6.0.0",
+    "ignore": "^7.0.5",
+    "ink": "^6.0.1",
     "ink-text-input": "^6.0.0",
     "react": "^19.1.0",
-    "tinyexec": "^1.0.1"
+    "tinyexec": "^1.0.1",
+    "use-zustand": "^0.2.0",
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
-    "@echristian/eslint-config": "^0.0.43",
-    "@types/node": "^24.0.3",
+    "@echristian/eslint-config": "^0.0.46",
+    "@types/bun": "^1.2.18",
     "@types/react": "^19.1.8",
     "bumpp": "^10.2.0",
-    "eslint": "^9.29.0",
+    "eslint": "^9.30.1",
     "lint-staged": "^16.1.2",
-    "prettier-plugin-packagejson": "^2.5.15",
+    "prettier-plugin-packagejson": "^2.5.18",
     "simple-git-hooks": "^2.13.0",
     "tsup": "^8.5.0",
     "typescript": "^5.8.3",
     "vitest": "^3.2.4"
-  },
-  "packageManager": "pnpm@10.12.2",
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "simple-git-hooks"
-    ]
   }
 }

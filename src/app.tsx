@@ -1,38 +1,61 @@
-import { Box, render, Text, useInput } from "ink"
-import TextInput from "ink-text-input"
-import React, { useState } from "react"
+import { QueryClientProvider, useQuery } from "@tanstack/react-query"
+import { Box, Text, useInput } from "ink"
+import { useEffect, useState, type ReactNode } from "react"
 
+import { ScrollArea } from "./components/scroll-area"
+import { listGitFiles } from "./lib/git"
 import { useStdoutDimensions } from "./lib/hooks"
+import { queryClient } from "./lib/query"
 
-export interface AppProps {
-  isGit: boolean
-}
-
-const App = (props: AppProps) => {
+export const App = () => {
   const dimensions = useStdoutDimensions()
-  const [value, setValue] = useState("")
 
-  useInput((input) => {
-    // You can still handle global input here if needed
+  const safeHeight = Math.floor(dimensions.height * 0.95)
+
+  useInput((input, key) => {
+    if (key.ctrl && input === "q") {
+      return process.exit(0)
+    }
   })
 
+  const files = useQuery({
+    queryKey: ["files"],
+    queryFn: () => listGitFiles("./"),
+  })
+
+  const [scrollAreaKey, setScrollAreaKey] = useState(0)
+
+  useEffect(() => {
+    // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
+    if (files.isSuccess) setScrollAreaKey((prev) => prev + 1)
+  }, [files.isSuccess])
+
   return (
-    <Box borderLeft={false} borderRight={false} borderStyle="single">
-      <Box flexDirection="column">
-        <Text>{JSON.stringify(props)}</Text>
-        <Text>{JSON.stringify(dimensions)}</Text>
-        <Box marginTop={1}>
-          <Text>Enter text: </Text>
-          <TextInput value={value} onChange={setValue} />
-        </Box>
-        <Box marginTop={1}>
-          <Text>You typed: {value}</Text>
-        </Box>
+    <Box
+      borderColor="yellow"
+      borderStyle="single"
+      height={safeHeight}
+      width={dimensions.width}
+    >
+      <ScrollArea
+        key={scrollAreaKey}
+        borderStyle="single"
+        height={safeHeight - 2}
+        width="100%"
+      >
+        <Text>{JSON.stringify(files.data, null, 2)}</Text>
+      </ScrollArea>
+      <Box borderStyle="single" width="100%">
+        <Text>You typed</Text>
       </Box>
     </Box>
   )
 }
 
-export const renderApp = (props: AppProps) => {
-  render(<App {...props} />)
+export const Providers = (props: { children: ReactNode }) => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      {props.children}
+    </QueryClientProvider>
+  )
 }
