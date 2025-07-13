@@ -1,6 +1,7 @@
 import { QueryClientProvider, useQuery } from "@tanstack/react-query"
 import { Box, useInput } from "ink"
-import { type ReactNode } from "react"
+import TextInput from "ink-text-input"
+import { useState, type ReactNode } from "react"
 
 import { Select } from "./components/select"
 import { listGitFiles, isGit as isGitFn } from "./lib/git"
@@ -29,16 +30,22 @@ export const App = () => {
     enabled: isGit.data,
   })
 
+  const [selectedFiles, setSelectedFiles] = useState<Array<string>>([])
+  const [instruction, setInstruction] = useState("")
+
   return (
-    <Box height={safeHeight} width={dimensions.width}>
+    <Box flexDirection="column" height={safeHeight} width={dimensions.width}>
       {files.isSuccess && (
         <Select
           borderStyle="round"
           bufferSize={0.4}
           items={files.data}
-          shownCount={safeHeight - 2}
+          shownCount={5}
+          value={selectedFiles}
+          onChange={setSelectedFiles}
         />
       )}
+      <TextInput value={instruction} onChange={setInstruction} />
     </Box>
   )
 }
