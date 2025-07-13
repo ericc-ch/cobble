@@ -16,22 +16,26 @@ export interface SelectProps extends BoxProps {
 
 // Modified from https://github.com/vadimdemedes/ink/issues/432#issuecomment-1519671092
 export function Select(props: SelectProps) {
-  const { bufferSize = 0.2, ...rest } = props
+  const { items, shownCount, bufferSize = 0.2, ...rest } = props
   const [cursor, setCursor] = useState(0)
   const [shownCursor, setShownCursor] = useState(0)
 
-  const shownLength = Math.min(props.shownCount, props.items.length)
-  const bufferLength = Math.floor(shownLength * bufferSize)
+  const safeShownLength = Math.min(shownCount, items.length)
+  const bufferLength = Math.floor(safeShownLength * bufferSize)
+
+  const canScrollUp = shownCursor > 0
+  const canScrollDown = shownCursor + safeShownLength < items.length
 
   const isCursorInPrevBuffer = cursor < shownCursor + bufferLength
-  const isCursorInNextBuffer = cursor > shownCursor + shownLength - bufferLength
+  const isCursorInNextBuffer =
+    cursor > shownCursor + safeShownLength - bufferLength
 
-  const shownItems = props.items
+  const shownItems = items
     .map((item, index) => ({
       name: item,
       originalIndex: index,
     }))
-    .slice(shownCursor, shownCursor + shownLength)
+    .slice(shownCursor, shownCursor + safeShownLength)
 
   const handlePrev = () => {
     setCursor(Math.max(0, cursor - 1))
@@ -42,12 +46,10 @@ export function Select(props: SelectProps) {
   }
 
   const handleNext = () => {
-    setCursor(Math.min(props.items.length - 1, cursor + 1))
+    setCursor(Math.min(items.length - 1, cursor + 1))
 
     if (isCursorInNextBuffer) {
-      setShownCursor(
-        Math.min(props.items.length - shownLength, shownCursor + 1),
-      )
+      setShownCursor(Math.min(items.length - safeShownLength, shownCursor + 1))
     }
   }
 
@@ -57,25 +59,30 @@ export function Select(props: SelectProps) {
   })
 
   return (
-    <Box
-      {...rest}
-      flexDirection="column"
-      height={props.shownCount}
-      overflow="hidden"
-    >
-      {shownItems.map((item) => {
-        return (
-          <Box key={item.name}>
-            <Text
-              backgroundColor={
-                cursor === item.originalIndex ? "yellow" : undefined
-              }
-            >
-              [x] {item.name}
-            </Text>
-          </Box>
-        )
-      })}
+    <Box {...rest} flexDirection="column">
+      <Box alignItems="center" flexDirection="column">
+        <Text>{canScrollUp ? "^" : "x"}</Text>
+      </Box>
+
+      <Box flexDirection="column" height={safeShownLength} overflow="hidden">
+        {shownItems.map((item) => {
+          return (
+            <Box key={item.name}>
+              <Text
+                backgroundColor={
+                  cursor === item.originalIndex ? "yellow" : undefined
+                }
+              >
+                [x] {item.name}
+              </Text>
+            </Box>
+          )
+        })}
+      </Box>
+
+      <Box alignItems="center" flexDirection="column">
+        <Text>{canScrollDown ? "v" : "x"}</Text>
+      </Box>
     </Box>
   )
 }
