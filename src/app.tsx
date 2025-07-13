@@ -30,37 +30,15 @@ export const App = () => {
   })
 
   return (
-    <Box
-      borderColor="yellow"
-      borderStyle="single"
-      height={safeHeight}
-      width={dimensions.width}
-    >
-      <Select
-        height={safeHeight - 2}
-        items={[
-          "file-1.ts",
-          "file-2.ts",
-          "file-3.ts",
-          "file-4.ts",
-          "file-5.ts",
-          "file-6.ts",
-          "file-7.ts",
-          "file-8.ts",
-          "file-9.ts",
-          "file-10.ts",
-          "file-11.ts",
-          "file-12.ts",
-          "file-13.ts",
-          "file-14.ts",
-          "file-15.ts",
-          "file-16.ts",
-          "file-17.ts",
-          "file-18.ts",
-          "file-19.ts",
-          "file-20.ts",
-        ]}
-      />
+    <Box height={safeHeight} width={dimensions.width}>
+      {files.isSuccess && (
+        <Select
+          borderStyle="round"
+          bufferSize={0.4}
+          items={files.data}
+          shownCount={safeHeight - 2}
+        />
+      )}
     </Box>
   )
 }
