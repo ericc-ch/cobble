@@ -1,25 +1,37 @@
-import { Box, measureElement, useInput, type BoxProps } from "ink"
-import { useState, type ReactNode } from "react"
+import { Box, Text, useInput, type BoxProps } from "ink"
+import { useState } from "react"
 
-export interface ScrollAreaProps extends BoxProps {
+export interface SelectProps extends BoxProps {
   height: number
-  children: ReactNode
+  items: Array<string>
 }
 
 // Modified from https://github.com/vadimdemedes/ink/issues/432#issuecomment-1519671092
-export function ScrollArea(props: ScrollAreaProps) {
+export function Select(props: SelectProps) {
   const [contentHeight, setContentHeight] = useState(0)
+  const [cursor, setCursor] = useState(0)
   const [offset, setOffset] = useState(0)
 
-  const handleScrollDown = () =>
-    setOffset(Math.min(contentHeight - props.height, offset + 1))
+  const handleUp = () => {
+    setCursor(Math.min(props.items.length - 1, cursor + 1))
+  }
 
-  const handleScrollUp = () => setOffset(Math.max(0, offset - 1))
+  const handleDown = () => {
+    setCursor(Math.max(0, cursor - 1))
+  }
 
   useInput((_input, key) => {
-    if (key.downArrow) handleScrollDown()
-    if (key.upArrow) handleScrollUp()
+    if (key.downArrow) handleUp()
+    if (key.upArrow) handleDown()
   })
+
+  const uniqueItems = [...new Set(props.items)]
+
+  const itemsBefore = uniqueItems.slice(0, cursor)
+  const currentItem = uniqueItems[cursor]
+  const itemsAfter = uniqueItems.slice(cursor + 1)
+
+  const visibleBefore = itemsBefore.slice
 
   return (
     <Box
@@ -28,19 +40,24 @@ export function ScrollArea(props: ScrollAreaProps) {
       height={props.height}
       overflow="hidden"
     >
-      <Box
-        ref={(ref) => {
-          if (!ref) return
+      {/* {uniqueItems.map((item, index) => {
+        return (
+          <Text
+            key={item}
+            backgroundColor={index === cursor ? "white" : undefined}
+          >
+            {item}
+          </Text>
+        )
+      })} */}
 
-          const dimensions = measureElement(ref)
-          setContentHeight(dimensions.height)
-        }}
-        flexDirection="column"
-        flexShrink={0}
-        marginTop={-offset}
-      >
-        {props.children}
-      </Box>
+      <Text>
+        {JSON.stringify(
+          { cursor, itemsBefore, currentItem, itemsAfter },
+          null,
+          2,
+        )}
+      </Text>
     </Box>
   )
 }
