@@ -1,5 +1,7 @@
+/* eslint-disable @eslint-react/hooks-extra/no-direct-set-state-in-use-effect */
 import { Box, Text, useInput, type BoxProps } from "ink"
-import { useState } from "react"
+import TextInput from "ink-text-input"
+import { useEffect, useState } from "react"
 
 export interface SelectProps extends BoxProps {
   /**
@@ -16,6 +18,7 @@ export interface SelectProps extends BoxProps {
    * @default 0.2
    */
   bufferSize?: number
+  isActive?: boolean
   /**
    * An array of the currently selected items.
    */
@@ -30,9 +33,9 @@ export interface SelectProps extends BoxProps {
 /**
  * A controlled, scrollable select list component for Ink.
  * Use arrow keys to navigate and spacebar or enter to toggle selection.
- *
- * Modified from https://github.com/vadimdemedes/ink/issues/432#issuecomment-1519671092
+ * Press '/' to filter items.
  */
+// eslint-disable-next-line max-lines-per-function
 export function Select(props: SelectProps) {
   const {
     items,
@@ -40,16 +43,24 @@ export function Select(props: SelectProps) {
     value,
     onChange,
     bufferSize = 0.2,
+    isActive,
     ...rest
   } = props
-  const [cursor, setCursor] = useState(0) // The absolute position of the cursor in the `items` array
-  const [shownCursor, setShownCursor] = useState(0) // The starting index of the visible slice of items
 
-  const safeShownLength = Math.min(shownCount, items.length)
+  const [cursor, setCursor] = useState(0) // The absolute position of the cursor in the `filteredItems` array
+  const [shownCursor, setShownCursor] = useState(0) // The starting index of the visible slice of items
+  const [filter, setFilter] = useState("")
+  const [isFiltering, setIsFiltering] = useState(false)
+
+  const filteredItems = items.filter((item) =>
+    item.toLowerCase().includes(filter.toLowerCase()),
+  )
+
+  const safeShownLength = Math.min(shownCount, filteredItems.length)
   const bufferLength = Math.floor(safeShownLength * bufferSize)
 
   const canScrollUp = shownCursor > 0
-  const canScrollDown = shownCursor + safeShownLength < items.length
+  const canScrollDown = shownCursor + safeShownLength < filteredItems.length
 
   // Check if the cursor is in the "buffer zone" which triggers scrolling
   const isCursorInPrevBuffer = cursor < shownCursor + bufferLength
@@ -57,12 +68,18 @@ export function Select(props: SelectProps) {
     cursor > shownCursor + safeShownLength - 1 - bufferLength
 
   // Get the slice of items that are currently visible
-  const shownItems = items
+  const shownItems = filteredItems
     .map((item, index) => ({
       name: item,
       originalIndex: index,
     }))
     .slice(shownCursor, shownCursor + safeShownLength)
+
+  useEffect(() => {
+    // Reset cursor when filter changes
+    setCursor(0)
+    setShownCursor(0)
+  }, [filter])
 
   /**
    * Moves the cursor up one position and scrolls the visible list if necessary.
@@ -80,11 +97,13 @@ export function Select(props: SelectProps) {
    * Moves the cursor down one position and scrolls the visible list if necessary.
    */
   const handleNext = () => {
-    const newCursor = Math.min(items.length - 1, cursor + 1)
+    const newCursor = Math.min(filteredItems.length - 1, cursor + 1)
     setCursor(newCursor)
 
     if (isCursorInNextBuffer) {
-      setShownCursor(Math.min(items.length - safeShownLength, shownCursor + 1))
+      setShownCursor(
+        Math.min(filteredItems.length - safeShownLength, shownCursor + 1),
+      )
     }
   }
 
@@ -93,7 +112,7 @@ export function Select(props: SelectProps) {
    * It calls the `onChange` prop with the new selection array.
    */
   const handleToggle = () => {
-    const itemUnderCursor = items[cursor]
+    const itemUnderCursor = filteredItems[cursor]
     if (!itemUnderCursor) return // Should not happen, but a good safeguard
 
     const isSelected = value.includes(itemUnderCursor)
@@ -105,38 +124,74 @@ export function Select(props: SelectProps) {
     onChange(newSelection)
   }
 
-  useInput((input, key) => {
-    if (key.upArrow) handlePrev()
-    if (key.downArrow) handleNext()
-    if (input === " ") handleToggle()
-  })
+  useInput(
+    (input, key) => {
+      if (isFiltering) {
+        if (key.escape) {
+          setIsFiltering(false)
+        }
+        return
+      }
+
+      if (key.upArrow) handlePrev()
+      if (key.downArrow) handleNext()
+      if (input === " ") handleToggle()
+      if (input === "/") {
+        setIsFiltering(true)
+      }
+    },
+    { isActive },
+  )
 
   return (
     <Box {...rest} flexDirection="column">
-      <Box alignItems="center" flexDirection="column">
-        <Text color="gray">{canScrollUp ? "▲" : " "}</Text>
-      </Box>
+      {isFiltering && (
+        <Box>
+          <Text>/ </Text>
+          <TextInput
+            value={filter}
+            onChange={setFilter}
+            onSubmit={() => setIsFiltering(false)}
+          />
+        </Box>
+      )}
 
       <Box flexDirection="column" height={safeShownLength} overflow="hidden">
-        {shownItems.map((item) => {
+        {shownItems.map((item, index) => {
           const isSelected = value.includes(item.name)
           const isCursorOnItem = cursor === item.originalIndex
+          const isFirstShown = index === 0
+          const isLastShown = index === shownItems.length - 1
+
+          let indicator = ""
+          if (isFirstShown && canScrollUp) {
+            indicator = " ▲"
+          }
+
+          if (isLastShown && canScrollDown) {
+            indicator = " ▼"
+          }
 
           return (
-            <Box key={item.name}>
-              <Text
-                backgroundColor={isCursorOnItem ? "yellow" : undefined}
-                color={isCursorOnItem ? "black" : "white"}
-              >
-                {isSelected ? "[x]" : "[ ]"} {item.name}
-              </Text>
+            <Box
+              key={item.name}
+              justifyContent="space-between"
+              paddingRight={1}
+            >
+              <Box>
+                <Text
+                  backgroundColor={isCursorOnItem ? "blue" : undefined}
+                  underline={isSelected}
+                  wrap="truncate-middle"
+                >
+                  {isSelected ? "[x]" : "[ ]"} {item.name}
+                </Text>
+              </Box>
+
+              <Text color="white">{indicator}</Text>
             </Box>
           )
         })}
-      </Box>
-
-      <Box alignItems="center" flexDirection="column">
-        <Text color="gray">{canScrollDown ? "▼" : " "}</Text>
       </Box>
     </Box>
   )

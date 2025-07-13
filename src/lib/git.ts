@@ -1,7 +1,7 @@
 import { x } from "tinyexec"
 
 // Modified from https://github.com/JPeer264/node-is-git-repository/blob/main/index.js
-export async function isGit(path: string) {
+export async function isGitDir(path: string) {
   const result = await x("git", ["rev-parse", "--is-inside-work-tree"], {
     nodeOptions: { cwd: path },
   })

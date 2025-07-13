@@ -1,18 +1,11 @@
 import { QueryClientProvider, useQuery } from "@tanstack/react-query"
 import { Box, useInput } from "ink"
-import TextInput from "ink-text-input"
 import { useState, type ReactNode } from "react"
 
-import { Select } from "./components/select"
-import { listGitFiles, isGitDir as isGitFn } from "./lib/git"
-import { useStdoutDimensions } from "./lib/hooks"
-import { queryClient } from "./lib/query"
+import { Select } from "../components/select"
+import { isGitDir, listGitFiles } from "../lib/git"
 
 export const App = () => {
-  const dimensions = useStdoutDimensions()
-
-  const safeHeight = Math.floor(dimensions.height * 0.95)
-
   useInput((input, key) => {
     if (key.ctrl && input === "q") {
       return process.exit(0)
@@ -21,7 +14,7 @@ export const App = () => {
 
   const isGit = useQuery({
     queryKey: ["is-git"],
-    queryFn: () => isGitFn(process.cwd()),
+    queryFn: () => isGitDir(process.cwd()),
   })
 
   const files = useQuery({
@@ -31,10 +24,9 @@ export const App = () => {
   })
 
   const [selectedFiles, setSelectedFiles] = useState<Array<string>>([])
-  const [instruction, setInstruction] = useState("")
 
   return (
-    <Box flexDirection="column" height={safeHeight} width={dimensions.width}>
+    <Box flexDirection="column" height={10} width="100%">
       {files.isSuccess && (
         <Select
           borderStyle="round"
@@ -46,9 +38,6 @@ export const App = () => {
           onChange={setSelectedFiles}
         />
       )}
-      <Box borderStyle="round">
-        <TextInput value={instruction} onChange={setInstruction} />
-      </Box>
     </Box>
   )
 }
