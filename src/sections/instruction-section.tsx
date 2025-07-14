@@ -1,18 +1,23 @@
 import { Box, Text, useInput } from "ink"
 import TextInput from "ink-text-input"
-import { useEffect } from "react" // Import useEffect
+import { useEffect } from "react"
 
 import type { SectionProps } from "../lib/modes"
 
 import { useFormActions, useFormModeSelector } from "../stores/form"
 import { useUIStore } from "../stores/ui" // Import the UI store
 
+interface InstructionSectionProps extends SectionProps {
+  placeholder?: string
+}
+
 export const InstructionSection = ({
   title,
   isActive,
   activeMode,
   onEscape,
-}: SectionProps) => {
+  placeholder,
+}: InstructionSectionProps) => {
   const instruction =
     useFormModeSelector(activeMode, (state) => state?.instruction) ?? ""
   const { setInstruction } = useFormActions()
@@ -24,8 +29,13 @@ export const InstructionSection = ({
   }, [isActive, setIsTextInputActive])
 
   useInput(
-    (_input, key) => {
+    (input, key) => {
       if (key.escape) onEscape()
+      if (key.ctrl && input === "r")
+        // This is stupid but useInput will fire before <TextInput> onChange
+        // Therefore the reset gets replaced by onChange value
+        // Setting 0 timeout here makes it go after onChange handler
+        setTimeout(() => setInstruction(activeMode, ""), 0)
     },
     { isActive },
   )
@@ -40,7 +50,7 @@ export const InstructionSection = ({
       >
         <TextInput
           focus={isActive}
-          placeholder="Write your instruction here..."
+          placeholder={placeholder ?? "Write your instruction here..."}
           value={instruction}
           onChange={(value) => setInstruction(activeMode, value)}
         />

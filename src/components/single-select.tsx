@@ -125,7 +125,7 @@ export function SingleSelect(props: SingleSelectProps) {
     (input, key) => {
       if (key.upArrow) handlePrev()
       if (key.downArrow) handleNext()
-      if (input === " " || key.return) handleSelect()
+      if (input === " ") handleSelect()
     },
     { isActive },
   )

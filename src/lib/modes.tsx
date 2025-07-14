@@ -63,7 +63,12 @@ export const modesConfig: Record<Mode, ModeConfig> = {
         id: "instruction",
         shortcut: "1",
         label: "Instruction",
-        component: (props) => <InstructionSection {...props} />,
+        component: (props) => (
+          <InstructionSection
+            placeholder="Write additional instruction here... (optional)"
+            {...props}
+          />
+        ),
       },
     ],
     onSubmit: (data) => {

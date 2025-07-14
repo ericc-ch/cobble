@@ -8,17 +8,18 @@ export const shortcutMap: Record<string, ShortcutMapping> = {
   // Shortcuts for the mode selection view (when activeSectionIndex is -1).
   mode: {
     "↑/↓": "Navigate",
-    "space/enter": "Select",
+    space: "Select",
   },
   // Shortcuts for the file selection component.
   files: {
     "↑/↓": "Navigate",
-    space: "Toggle File",
+    space: "Toggle file",
     "/": "Search",
-    esc: "EXit search",
+    esc: "Exit search",
   },
   // Shortcuts for the instruction input component.
   instruction: {
-    esc: "Back to Mode Select",
+    esc: "Back to mode select",
+    "ctrl-r": "Reset input",
   },
 }
