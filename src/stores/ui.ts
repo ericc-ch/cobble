@@ -1,19 +1,20 @@
 import { create } from "zustand"
 
-type Section = "files" | "instruction"
+import type { Mode } from "../lib/modes"
 
 interface UIStore {
-  activeSection: "files" | "instruction"
-  setActiveSection: (section: Section) => void
+  activeMode: Mode
+  setActiveMode: (mode: Mode) => void
 
-  isFilesActive: () => boolean
-  isInstructionActive: () => boolean
+  // The index of the active section. -1 represents the mode selection view.
+  activeSectionIndex: number
+  setActiveSectionIndex: (index: number) => void
 }
 
-export const useUIStore = create<UIStore>()((set, get) => ({
-  activeSection: "files",
-  setActiveSection: (section) => set({ activeSection: section }),
+export const useUIStore = create<UIStore>()((set) => ({
+  activeMode: "code",
+  setActiveMode: (mode) => set({ activeMode: mode, activeSectionIndex: -1 }),
 
-  isFilesActive: () => get().activeSection === "files",
-  isInstructionActive: () => get().activeSection === "instruction",
+  activeSectionIndex: -1, // Start with mode selection focused
+  setActiveSectionIndex: (index) => set({ activeSectionIndex: index }),
 }))

@@ -1,58 +1,74 @@
-import { QueryClientProvider, useQuery } from "@tanstack/react-query"
-import { Box, useInput } from "ink"
-import TextInput from "ink-text-input"
-import { useState, type ReactNode } from "react"
+import { QueryClientProvider } from "@tanstack/react-query"
+import { Box, Text, useInput } from "ink"
+import { type ReactNode } from "react"
 
-import { Select } from "./components/select"
-import { listGitFiles, isGitDir as isGitFn } from "./lib/git"
-import { useStdoutDimensions } from "./lib/hooks"
+import { modesConfig } from "./lib/modes"
 import { queryClient } from "./lib/query"
+import { ModeSection } from "./sections/mode-section"
+import { useFormActions } from "./stores/form"
+import { useUIStore } from "./stores/ui"
 
 export const App = () => {
-  const dimensions = useStdoutDimensions()
+  const { activeMode, activeSectionIndex, setActiveSectionIndex } = useUIStore()
+  const { getFormData } = useFormActions()
 
-  const safeHeight = Math.floor(dimensions.height * 0.95)
+  const currentModeConfig = modesConfig[activeMode]
 
   useInput((input, key) => {
-    if (key.ctrl && input === "q") {
-      return process.exit(0)
+    // Global quit
+    if (key.ctrl && input === "q") process.exit(0)
+
+    // Handle mode selection shortcut
+    if (input === "0") {
+      setActiveSectionIndex(-1)
+      return
+    }
+
+    // Find section index based on custom shortcut
+    const sectionIndex = currentModeConfig.sections.findIndex(
+      (section) => section.shortcut === input,
+    )
+
+    if (sectionIndex !== -1) {
+      setActiveSectionIndex(sectionIndex)
+    }
+
+    // Submission on Enter key when the last section is active
+    if (key.return) {
+      const formData = getFormData(activeMode)
+      if (!formData) return
+
+      currentModeConfig.onSubmit(formData)
     }
   })
 
-  const isGit = useQuery({
-    queryKey: ["is-git"],
-    queryFn: () => isGitFn(process.cwd()),
-  })
-
-  const files = useQuery({
-    queryKey: ["files"],
-    queryFn: () => listGitFiles("./"),
-    enabled: isGit.data,
-  })
-
-  const [selectedFiles, setSelectedFiles] = useState<Array<string>>([])
-  const [instruction, setInstruction] = useState("")
-
   return (
-    <Box flexDirection="column" height={safeHeight} width={dimensions.width}>
-      {files.isSuccess && (
-        <Select
-          borderStyle="round"
-          bufferSize={0.4}
-          items={files.data}
-          shownCount={5}
-          value={selectedFiles}
-          width="100%"
-          onChange={setSelectedFiles}
-        />
-      )}
-      <Box borderStyle="round">
-        <TextInput value={instruction} onChange={setInstruction} />
+    <Box flexDirection="column">
+      <ModeSection isActive={activeSectionIndex === -1} />
+
+      {currentModeConfig.sections.map((section, index) => {
+        const Component = section.component
+        const title = `[${section.shortcut}] ${section.label}:`
+
+        return (
+          <Component
+            key={`${activeMode}-${section.id}`}
+            activeMode={activeMode}
+            isActive={activeSectionIndex === index}
+            title={title}
+            onEscape={() => setActiveSectionIndex(-1)}
+          />
+        )
+      })}
+
+      <Box>
+        <Text color="gray">Quit: {"<ctrl-q>"}</Text>
       </Box>
     </Box>
   )
 }
 
+// Providers wrapper remains the same
 export const Providers = (props: { children: ReactNode }) => {
   return (
     <QueryClientProvider client={queryClient}>

@@ -36,7 +36,7 @@ export interface SelectProps extends BoxProps {
  * Press '/' to filter items.
  */
 // eslint-disable-next-line max-lines-per-function
-export function Select(props: SelectProps) {
+export function MultiSelect(props: SelectProps) {
   const {
     items,
     shownCount,
@@ -144,10 +144,10 @@ export function Select(props: SelectProps) {
   )
 
   return (
-    <Box {...rest} flexDirection="column">
+    <Box {...rest} flexDirection="column" paddingX={1}>
       {isFiltering && (
         <Box>
-          <Text>/ </Text>
+          <Text>Search: </Text>
           <TextInput
             value={filter}
             onChange={setFilter}
@@ -173,14 +173,10 @@ export function Select(props: SelectProps) {
           }
 
           return (
-            <Box
-              key={item.name}
-              justifyContent="space-between"
-              paddingRight={1}
-            >
+            <Box key={item.name} justifyContent="space-between">
               <Box>
                 <Text
-                  backgroundColor={isCursorOnItem ? "blue" : undefined}
+                  backgroundColor={isCursorOnItem ? "yellowBright" : undefined}
                   underline={isSelected}
                   wrap="truncate-middle"
                 >

@@ -1,51 +1,56 @@
-import { QueryClientProvider, useQuery } from "@tanstack/react-query"
-import { Box, useInput } from "ink"
-import { useState, type ReactNode } from "react"
+import { useQuery } from "@tanstack/react-query"
+import { Box, Text, useInput } from "ink"
 
-import { Select } from "../components/select"
-import { isGitDir, listGitFiles } from "../lib/git"
+import type { SectionProps } from "../lib/modes"
 
-export const App = () => {
-  useInput((input, key) => {
-    if (key.ctrl && input === "q") {
-      return process.exit(0)
-    }
-  })
+import { MultiSelect } from "../components/multi-select"
+import { listGitFiles } from "../lib/git"
+import { useFormActions, useFormModeSelector } from "../stores/form"
 
-  const isGit = useQuery({
-    queryKey: ["is-git"],
-    queryFn: () => isGitDir(process.cwd()),
-  })
+export const FilesSection = ({
+  title,
+  isActive,
+  activeMode,
+  onEscape,
+}: SectionProps) => {
+  const selectedFiles =
+    useFormModeSelector(activeMode, (state) => state?.selectedFiles) ?? []
+  const { setSelectedFiles } = useFormActions()
 
-  const files = useQuery({
-    queryKey: ["files"],
+  const filesQuery = useQuery({
+    queryKey: ["git-files"],
     queryFn: () => listGitFiles("./"),
-    enabled: isGit.data,
   })
 
-  const [selectedFiles, setSelectedFiles] = useState<Array<string>>([])
-
-  return (
-    <Box flexDirection="column" height={10} width="100%">
-      {files.isSuccess && (
-        <Select
-          borderStyle="round"
-          bufferSize={0.4}
-          items={files.data}
-          shownCount={5}
-          value={selectedFiles}
-          width="100%"
-          onChange={setSelectedFiles}
-        />
-      )}
-    </Box>
+  useInput(
+    (_input, key) => {
+      if (key.escape) onEscape()
+    },
+    { isActive },
   )
-}
 
-export const Providers = (props: { children: ReactNode }) => {
+  if (filesQuery.isPending) {
+    return <Text>Loading files...</Text>
+  }
+
+  if (filesQuery.isError) {
+    return <Text>Error: {filesQuery.error.message}</Text>
+  }
+
   return (
-    <QueryClientProvider client={queryClient}>
-      {props.children}
-    </QueryClientProvider>
+    <Box flexDirection="column">
+      <Text color={isActive ? "yellow" : undefined}>{title}</Text>
+      <MultiSelect
+        borderColor={isActive ? "yellow" : undefined}
+        borderStyle="round"
+        bufferSize={0.4}
+        isActive={isActive}
+        items={filesQuery.data}
+        shownCount={8}
+        value={selectedFiles}
+        width="100%"
+        onChange={(value) => setSelectedFiles(activeMode, value)}
+      />
+    </Box>
   )
 }
