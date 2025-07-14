@@ -28,6 +28,10 @@ export interface SelectProps extends BoxProps {
    * It receives the new array of selected items.
    */
   onChange: (newSelection: Array<string>) => void
+  /**
+   * Callback function that is called when the filtering state changes.
+   */
+  onFilteringChange?: (isFiltering: boolean) => void
 }
 
 /**
@@ -44,6 +48,7 @@ export function MultiSelect(props: SelectProps) {
     onChange,
     bufferSize = 0.2,
     isActive,
+    onFilteringChange,
     ...rest
   } = props
 
@@ -51,6 +56,11 @@ export function MultiSelect(props: SelectProps) {
   const [shownCursor, setShownCursor] = useState(0) // The starting index of the visible slice of items
   const [filter, setFilter] = useState("")
   const [isFiltering, setIsFiltering] = useState(false)
+
+  const handleSetIsFiltering = (filtering: boolean) => {
+    setIsFiltering(filtering)
+    onFilteringChange?.(filtering)
+  }
 
   const filteredItems = items.filter((item) =>
     item.toLowerCase().includes(filter.toLowerCase()),
@@ -128,7 +138,7 @@ export function MultiSelect(props: SelectProps) {
     (input, key) => {
       if (isFiltering) {
         if (key.escape) {
-          setIsFiltering(false)
+          handleSetIsFiltering(false)
         }
         return
       }
@@ -137,7 +147,7 @@ export function MultiSelect(props: SelectProps) {
       if (key.downArrow) handleNext()
       if (input === " ") handleToggle()
       if (input === "/") {
-        setIsFiltering(true)
+        handleSetIsFiltering(true)
       }
     },
     { isActive },
@@ -151,7 +161,7 @@ export function MultiSelect(props: SelectProps) {
           <TextInput
             value={filter}
             onChange={setFilter}
-            onSubmit={() => setIsFiltering(false)}
+            onSubmit={() => handleSetIsFiltering(false)}
           />
         </Box>
       )}

@@ -9,38 +9,47 @@ import { useFormActions } from "./stores/form"
 import { useUIStore } from "./stores/ui"
 
 export const App = () => {
-  const { activeMode, activeSectionIndex, setActiveSectionIndex } = useUIStore()
+  const {
+    activeMode,
+    activeSectionIndex,
+    setActiveSectionIndex,
+    isTextInputActive, // Get the new state
+  } = useUIStore()
   const { getFormData } = useFormActions()
 
   const currentModeConfig = modesConfig[activeMode]
 
-  useInput((input, key) => {
-    // Global quit
-    if (key.ctrl && input === "q") process.exit(0)
+  useInput(
+    (input, key) => {
+      // Global quit
+      if (key.ctrl && input === "q") process.exit(0)
 
-    // Handle mode selection shortcut
-    if (input === "0") {
-      setActiveSectionIndex(-1)
-      return
-    }
+      // Handle mode selection shortcut
+      if (input === "0") {
+        setActiveSectionIndex(-1)
+        return
+      }
 
-    // Find section index based on custom shortcut
-    const sectionIndex = currentModeConfig.sections.findIndex(
-      (section) => section.shortcut === input,
-    )
+      // Find section index based on custom shortcut
+      const sectionIndex = currentModeConfig.sections.findIndex(
+        (section) => section.shortcut === input,
+      )
 
-    if (sectionIndex !== -1) {
-      setActiveSectionIndex(sectionIndex)
-    }
+      if (sectionIndex !== -1) {
+        setActiveSectionIndex(sectionIndex)
+      }
 
-    // Submission on Enter key when the last section is active
-    if (key.return) {
-      const formData = getFormData(activeMode)
-      if (!formData) return
+      // Submission on Enter key when the last section is active
+      if (key.return) {
+        const formData = getFormData(activeMode)
+        if (!formData) return
 
-      currentModeConfig.onSubmit(formData)
-    }
-  })
+        currentModeConfig.onSubmit(formData)
+      }
+    },
+    // Prevent this hook from running when a text input is active
+    { isActive: !isTextInputActive },
+  )
 
   return (
     <Box flexDirection="column">

@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query"
 import { Box, Text, useInput } from "ink"
+import { useEffect, useState } from "react" // Import useEffect and useState
 
 import type { SectionProps } from "../lib/modes"
 
 import { MultiSelect } from "../components/multi-select"
 import { listGitFiles } from "../lib/git"
 import { useFormActions, useFormModeSelector } from "../stores/form"
+import { useUIStore } from "../stores/ui" // Import the UI store
 
 export const FilesSection = ({
   title,
@@ -16,11 +18,18 @@ export const FilesSection = ({
   const selectedFiles =
     useFormModeSelector(activeMode, (state) => state?.selectedFiles) ?? []
   const { setSelectedFiles } = useFormActions()
+  const { setIsTextInputActive } = useUIStore() // Get the action
+  const [isFiltering, setIsFiltering] = useState(false)
 
   const filesQuery = useQuery({
     queryKey: ["git-files"],
     queryFn: () => listGitFiles("./"),
   })
+
+  // Set global input lock only if this section is active and filtering
+  useEffect(() => {
+    setIsTextInputActive(isActive && isFiltering)
+  }, [isActive, isFiltering, setIsTextInputActive])
 
   useInput(
     (_input, key) => {
@@ -50,6 +59,7 @@ export const FilesSection = ({
         value={selectedFiles}
         width="100%"
         onChange={(value) => setSelectedFiles(activeMode, value)}
+        onFilteringChange={setIsFiltering} // Update local state on change
       />
     </Box>
   )

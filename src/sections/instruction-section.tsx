@@ -1,9 +1,11 @@
 import { Box, Text, useInput } from "ink"
 import TextInput from "ink-text-input"
+import { useEffect } from "react" // Import useEffect
 
 import type { SectionProps } from "../lib/modes"
 
 import { useFormActions, useFormModeSelector } from "../stores/form"
+import { useUIStore } from "../stores/ui" // Import the UI store
 
 export const InstructionSection = ({
   title,
@@ -14,6 +16,12 @@ export const InstructionSection = ({
   const instruction =
     useFormModeSelector(activeMode, (state) => state?.instruction) ?? ""
   const { setInstruction } = useFormActions()
+  const { setIsTextInputActive } = useUIStore() // Get the action
+
+  // Sync active state with the global text input state
+  useEffect(() => {
+    setIsTextInputActive(isActive)
+  }, [isActive, setIsTextInputActive])
 
   useInput(
     (_input, key) => {
