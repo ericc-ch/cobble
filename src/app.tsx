@@ -1,10 +1,11 @@
 import { QueryClientProvider } from "@tanstack/react-query"
-import { Box, Text, useInput } from "ink"
+import { Box, useInput } from "ink"
 import { type ReactNode } from "react"
 
 import { modesConfig } from "./lib/modes"
 import { queryClient } from "./lib/query"
 import { ModeSection } from "./sections/mode-section"
+import { Shortcuts } from "./sections/shortcuts-section"
 import { useFormActions } from "./stores/form"
 import { useUIStore } from "./stores/ui"
 
@@ -19,18 +20,18 @@ export const App = () => {
 
   const currentModeConfig = modesConfig[activeMode]
 
+  // Always active
+  useInput((input, key) => {
+    if (key.ctrl && input === "q") process.exit(0)
+  })
+
   useInput(
     (input, key) => {
-      // Global quit
-      if (key.ctrl && input === "q") process.exit(0)
-
-      // Handle mode selection shortcut
       if (input === "0") {
         setActiveSectionIndex(-1)
         return
       }
 
-      // Find section index based on custom shortcut
       const sectionIndex = currentModeConfig.sections.findIndex(
         (section) => section.shortcut === input,
       )
@@ -39,7 +40,6 @@ export const App = () => {
         setActiveSectionIndex(sectionIndex)
       }
 
-      // Submission on Enter key when the last section is active
       if (key.return) {
         const formData = getFormData(activeMode)
         if (!formData) return
@@ -47,7 +47,7 @@ export const App = () => {
         currentModeConfig.onSubmit(formData)
       }
     },
-    // Prevent this hook from running when a text input is active
+
     { isActive: !isTextInputActive },
   )
 
@@ -70,9 +70,10 @@ export const App = () => {
         )
       })}
 
-      <Box>
-        <Text color="gray">Quit: {"<ctrl-q>"}</Text>
-      </Box>
+      <Shortcuts
+        activeMode={activeMode}
+        activeSectionIndex={activeSectionIndex}
+      />
     </Box>
   )
 }
