@@ -48,6 +48,7 @@
     "ink": "^6.0.1",
     "ink-text-input": "^6.0.0",
     "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "tinyexec": "^1.0.1",
     "use-zustand": "^0.2.0",
     "zustand": "^5.0.6"
