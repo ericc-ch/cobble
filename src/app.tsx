@@ -77,7 +77,6 @@ export const App = () => {
             activeMode={activeMode}
             isActive={activeSectionIndex === index}
             title={title}
-            onEscape={() => setActiveSectionIndex(-1)}
           />
         )
       })}
