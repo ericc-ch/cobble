@@ -12,4 +12,8 @@ export default defineConfig({
   removeNodeProtocol: false,
   sourcemap: true,
   clean: true,
+
+  loader: {
+    ".txt": "text",
+  },
 })

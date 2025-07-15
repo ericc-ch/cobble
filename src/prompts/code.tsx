@@ -1,11 +1,11 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck I really have no other choice, can't wrap my head around why the JSX isn't properly typed
 
-import fs from "node:fs/promises"
-import path from "node:path"
 import { renderToStaticMarkup } from "react-dom/server"
 
 import { replacePlaceholders } from "~/lib/template"
+
+import template from "./code.txt"
 
 interface BuildCodePromptOptions {
   projectFiles: string
@@ -16,14 +16,11 @@ interface BuildCodePromptOptions {
   instruction: string
 }
 
-export async function buildCodePrompt({
+export function buildCodePrompt({
   projectFiles,
   files,
   instruction,
 }: BuildCodePromptOptions) {
-  const templateFile = path.join(import.meta.dir, "code.txt")
-  const template = await fs.readFile(templateFile, "utf8")
-
   const contextXML = (
     <context>
       <project_files>{projectFiles}</project_files>
