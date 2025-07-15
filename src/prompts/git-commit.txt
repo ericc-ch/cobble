@@ -12,6 +12,7 @@ Rules:
 4. If the changes are significant, write a concise body explaining the 'what' and 'why' of the change.
 5. The commit message should be based only on the provided context (branch_name, recent_commits, staged_diff).
 6. Your final output must be only the raw text of the commit message. Do not include any explanations, introductory text, or markdown formatting.
+7. Your response must be in a plaintext code fence.
 </instructions>
 
 <context>
