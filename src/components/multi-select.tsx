@@ -134,21 +134,34 @@ export function MultiSelect(props: SelectProps) {
     onChange(newSelection)
   }
 
+  const handleToggleAll = () => {
+    const allFilteredSelected = filteredItems.every((item) =>
+      value.includes(item),
+    )
+
+    if (allFilteredSelected) {
+      // All are selected -> deselect them
+      const newSelection = value.filter(
+        (selectedItem) => !filteredItems.includes(selectedItem),
+      )
+      onChange(newSelection)
+    } else {
+      // Not all are selected -> select them all
+      const newSelection = [...new Set([...value, ...filteredItems])]
+      onChange(newSelection)
+    }
+  }
+
   useInput(
     (input, key) => {
-      if (isFiltering) {
-        if (key.escape) {
-          handleSetIsFiltering(false)
-        }
-        return
-      }
-
       if (key.upArrow) handlePrev()
       if (key.downArrow) handleNext()
+
       if (input === " ") handleToggle()
-      if (input === "/") {
-        handleSetIsFiltering(true)
-      }
+      if (key.ctrl && input === "a") handleToggleAll()
+
+      if (input === "/") handleSetIsFiltering(true)
+      if (key.escape && isFiltering) handleSetIsFiltering(false)
     },
     { isActive },
   )

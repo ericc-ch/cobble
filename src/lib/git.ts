@@ -9,13 +9,29 @@ export async function isGitDir(path: string) {
   return result.exitCode === 0
 }
 
-export async function listGitFiles(path: string) {
-  const result = await x("git", ["ls-files"], {
+export async function getGitDir(path: string) {
+  const result = await x("git", ["rev-parse", "--git-dir"], {
     nodeOptions: { cwd: path },
+    throwOnError: true,
   })
 
-  return result.stdout.split("\n").filter(Boolean).sort(sortFiles)
+  return result.stdout.trim()
 }
+
+export async function listGitFilesRaw(path: string) {
+  const result = await x("git", ["ls-files"], {
+    nodeOptions: { cwd: path },
+    throwOnError: true,
+  })
+
+  return result.stdout.trim()
+}
+
+export async function listGitFiles(path: string) {
+  return (await listGitFilesRaw(path)).split("\n").sort(sortFiles)
+}
+
+// Utils
 
 const sortFiles = (a: string, b: string) => {
   const categoryA = getCategory(a)

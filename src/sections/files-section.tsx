@@ -5,7 +5,7 @@ import { useEffect, useState } from "react" // Import useEffect and useState
 import type { SectionProps } from "../lib/modes"
 
 import { MultiSelect } from "../components/multi-select"
-import { listGitFiles } from "../lib/git"
+import { getFilesQuery } from "../queries/get-files"
 import { useFormActions, useFormModeSelector } from "../stores/form"
 import { useUIStore } from "../stores/ui" // Import the UI store
 
@@ -21,10 +21,7 @@ export const FilesSection = ({
   const { setIsTextInputActive } = useUIStore() // Get the action
   const [isFiltering, setIsFiltering] = useState(false)
 
-  const filesQuery = useQuery({
-    queryKey: ["git-files"],
-    queryFn: () => listGitFiles("./"),
-  })
+  const filesQuery = useQuery(getFilesQuery(process.cwd()))
 
   // Set global input lock only if this section is active and filtering
   useEffect(() => {

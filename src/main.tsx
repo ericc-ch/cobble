@@ -1,22 +1,41 @@
+import chokidar from "chokidar"
+import consola from "consola"
 import { render } from "ink"
+import path from "node:path"
+import { StrictMode } from "react"
 
 import { App, Providers } from "./app"
-import { isGitDir } from "./lib/git"
+import { getGitDir } from "./lib/git"
+import { queryClient } from "./lib/query"
+import { getFilesQuery } from "./queries/get-files"
 
-const isGit = await isGitDir(process.cwd())
+const workingDir = process.cwd()
 
-if (!isGit) {
-  console.error("Not a git repository")
+try {
+  await queryClient.fetchQuery(getFilesQuery(workingDir))
+} catch (error) {
+  consola.error(error)
+  consola.error("Failed to list files. Are you in a git repository?")
   process.exit(1)
 }
 
-// process.stdout.write(enterAlternativeScreen)
-// process.on("exit", () => {
-//   process.stdout.write(exitAlternativeScreen)
-// })
+const gitDir = await getGitDir(workingDir)
+const pathsToWatch = [path.join(gitDir, "index"), path.join(gitDir, "HEAD")]
+
+const watcher = chokidar.watch(pathsToWatch, {
+  cwd: workingDir,
+})
+
+watcher.on("all", () => {
+  // I don't know why but chokidar will not watch
+  // This will never get triggered
+  void queryClient.invalidateQueries(getFilesQuery(workingDir))
+})
 
 render(
-  <Providers>
-    <App />
-  </Providers>,
+  <StrictMode>
+    <Providers>
+      <App />
+    </Providers>
+  </StrictMode>,
 )
