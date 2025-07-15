@@ -38,19 +38,15 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.82.0",
-    "ansi-escapes": "^7.0.0",
     "chokidar": "^4.0.3",
     "citty": "^0.1.6",
     "clipboardy": "^4.0.0",
     "consola": "^3.4.2",
-    "effect": "^3.16.12",
-    "ignore": "^7.0.5",
     "ink": "^6.0.1",
     "ink-text-input": "^6.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "tinyexec": "^1.0.1",
-    "use-zustand": "^0.2.0",
     "zustand": "^5.0.6"
   },
   "devDependencies": {
