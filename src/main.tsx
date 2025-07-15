@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import chokidar from "chokidar"
 import { defineCommand, runMain } from "citty"
 import consola from "consola"
