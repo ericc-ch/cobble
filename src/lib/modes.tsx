@@ -1,22 +1,24 @@
+import clipboard from "clipboardy"
+import fs from "node:fs/promises"
 import { type ReactNode } from "react"
 
 import type { FormState } from "../stores/form"
 
+import { buildCodePrompt } from "../prompts/code"
 import { FilesSection } from "../sections/files-section"
 import { InstructionSection } from "../sections/instruction-section"
+import { useLogsStore } from "../stores/logs"
+import { listGitFilesRaw } from "./git"
 
 export type Mode = "code" | "git-commit"
 export type Section = "mode" | "code-files" | "code-instruction"
 
-// Defines the props that will be passed down to every section component.
 export interface SectionProps {
   title: string
   isActive: boolean
   activeMode: Mode
-  onEscape: () => void
 }
 
-// Defines the structure of a section within a mode's configuration.
 export interface ModeSection {
   id: string
   shortcut: string // The key the user presses to focus this section.
@@ -49,11 +51,51 @@ export const modesConfig: Record<Mode, ModeConfig> = {
         component: (props) => <InstructionSection {...props} />,
       },
     ],
-    onSubmit: (data) => {
-      console.log("--- Submitting for Code Mode ---")
-      console.log("Selected Files:", data.selectedFiles)
-      console.log("Instruction:", data.instruction)
-      process.exit(0)
+    onSubmit: async (data) => {
+      const { addLog } = useLogsStore.getState()
+
+      if (!data.selectedFiles || data.selectedFiles.length === 0) {
+        addLog({
+          type: "error",
+          message: "No files selected.",
+        })
+        return
+      }
+
+      if (!data.instruction) {
+        addLog({
+          type: "error",
+          message: "No instruction provided.",
+        })
+        return
+      }
+
+      const promises = data.selectedFiles.map(async (file) => {
+        const content = await fs.readFile(file, "utf8").catch(() => {
+          addLog({
+            type: "error",
+            message: `Failed to read file: ${file}. The file might be deleted from the filesystem, but not from git.`,
+          })
+          return ""
+        })
+        return { path: file, content }
+      })
+
+      const projectFiles = await listGitFilesRaw(process.cwd())
+      const files = (await Promise.all(promises)).filter((file) => file.content)
+
+      const prompt = buildCodePrompt({
+        projectFiles,
+        files: files,
+        instruction: data.instruction,
+      })
+
+      await clipboard.write(prompt)
+
+      addLog({
+        type: "success",
+        message: "Prompt copied to clipboard.",
+      })
     },
   },
   "git-commit": {

@@ -1,16 +1,16 @@
 interface BuildCodePromptOptions {
-  projectFileStructure: string
-  relevantFiles: Array<{
+  projectFiles: string
+  files: Array<{
     path: string
     content: string
   }>
-  userQuery: string
+  instruction: string
 }
 
 export function buildCodePrompt({
-  projectFileStructure,
-  relevantFiles,
-  userQuery,
+  projectFiles,
+  files,
+  instruction,
 }: BuildCodePromptOptions): string {
   const systemMessage = `<system_message>
 You are an expert software engineer. Your purpose is to analyze the provided context and files to generate high-quality, complete, and accurate code. You must follow all instructions precisely.
@@ -91,8 +91,8 @@ You are an expert software engineer. Your purpose is to analyze the provided con
 5.  Inside each code fence, you must provide the entire, complete content of the file from the very first line to the very last line. Do not use placeholders, comments like \`// ... rest of the code\`, or provide only partial code snippets.
 </instructions>`
 
-  const fileContexts = relevantFiles
-    .map((file) => `<file name="${file.path}">\n${file.content}\n</file>`)
+  const fileContexts = files
+    .map((file) => `<file path="${file.path}">\n${file.content}\n</file>`)
     .join("\n\n")
 
   return `${systemMessage}
@@ -100,14 +100,14 @@ You are an expert software engineer. Your purpose is to analyze the provided con
 ${instructions}
 
 <context>
-<project_file_structure>
-${projectFileStructure}
-</project_file_structure>
+<project_files>
+${projectFiles}
+</project_files>
 
 ${fileContexts}
 </context>
 
-<user_query>
-${userQuery}
-</user_query>`
+<instruction>
+${instruction}
+</instruction>`
 }

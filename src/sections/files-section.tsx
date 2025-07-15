@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { Box, Text, useInput } from "ink"
+import { Box, Text } from "ink"
 import { useEffect, useState } from "react" // Import useEffect and useState
 
 import type { SectionProps } from "../lib/modes"
@@ -9,31 +9,18 @@ import { getFilesQuery } from "../queries/get-files"
 import { useFormActions, useFormModeSelector } from "../stores/form"
 import { useUIStore } from "../stores/ui" // Import the UI store
 
-export const FilesSection = ({
-  title,
-  isActive,
-  activeMode,
-  onEscape,
-}: SectionProps) => {
+export const FilesSection = ({ title, isActive, activeMode }: SectionProps) => {
   const selectedFiles =
     useFormModeSelector(activeMode, (state) => state?.selectedFiles) ?? []
   const { setSelectedFiles } = useFormActions()
-  const { setIsTextInputActive } = useUIStore() // Get the action
+  const { setIsTextInputActive } = useUIStore()
   const [isFiltering, setIsFiltering] = useState(false)
 
   const filesQuery = useQuery(getFilesQuery(process.cwd()))
 
-  // Set global input lock only if this section is active and filtering
   useEffect(() => {
     setIsTextInputActive(isActive && isFiltering)
   }, [isActive, isFiltering, setIsTextInputActive])
-
-  useInput(
-    (_input, key) => {
-      if (key.escape) onEscape()
-    },
-    { isActive },
-  )
 
   if (filesQuery.isPending) {
     return <Text>Loading files...</Text>

@@ -157,11 +157,14 @@ export function MultiSelect(props: SelectProps) {
       if (key.upArrow) handlePrev()
       if (key.downArrow) handleNext()
 
-      if (input === " ") handleToggle()
-      if (key.ctrl && input === "a") handleToggleAll()
+      if (isFiltering) {
+        if (key.escape) handleSetIsFiltering(false)
+      } else {
+        if (input === "/") handleSetIsFiltering(true)
 
-      if (input === "/") handleSetIsFiltering(true)
-      if (key.escape && isFiltering) handleSetIsFiltering(false)
+        if (input === " ") handleToggle()
+        if (key.ctrl && input === "a") handleToggleAll()
+      }
     },
     { isActive },
   )
