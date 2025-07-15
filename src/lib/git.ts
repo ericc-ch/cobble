@@ -18,6 +18,39 @@ export async function getGitDir(path: string) {
   return result.stdout.trim()
 }
 
+export async function getCurrentBranchName(path: string) {
+  const result = await x("git", ["rev-parse", "--abbrev-ref", "HEAD"], {
+    nodeOptions: { cwd: path },
+    throwOnError: true,
+  })
+
+  return result.stdout.trim()
+}
+
+export async function getRecentCommits(path: string, n = 3) {
+  const result = await x("git", ["log", `-n${n}`, "--oneline"], {
+    nodeOptions: { cwd: path },
+    throwOnError: true,
+  })
+
+  return result.stdout.trim()
+}
+
+/**
+ * Gets the staged git diff.
+ *
+ * @param path The path to the git repository.
+ * @returns The staged diff, or an empty string if there are no staged changes.
+ */
+export async function getStagedDiff(path: string) {
+  const result = await x("git", ["diff", "--staged"], {
+    nodeOptions: { cwd: path },
+    throwOnError: true,
+  })
+
+  return result.stdout.trim()
+}
+
 export async function listGitFilesRaw(path: string) {
   const result = await x("git", ["ls-files"], {
     nodeOptions: { cwd: path },

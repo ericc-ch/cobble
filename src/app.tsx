@@ -34,7 +34,7 @@ export const App = () => {
 
     if (key.return) {
       const formData = getFormData(activeMode)
-      if (formData) currentModeConfig.onSubmit(formData)
+      currentModeConfig.onSubmit(formData ?? {})
     }
   })
 
@@ -59,6 +59,7 @@ export const App = () => {
             key={log.id}
             borderColor={logColors.get(log.type)}
             borderStyle="round"
+            paddingX={1}
           >
             <Text>{log.message}</Text>
           </Box>
