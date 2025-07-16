@@ -4,13 +4,14 @@ import { type ReactNode } from "react"
 
 import { buildCodePrompt } from "~/prompts/code"
 import { buildGitCommitPrompt } from "~/prompts/git-commit"
+import { getFilesQuery } from "~/queries/get-files"
 
 import type { FormState } from "../stores/form"
 
 import { FilesSection } from "../sections/files-section"
 import { InstructionSection } from "../sections/instruction-section"
 import { useLogsStore } from "../stores/logs"
-import { listGitFilesRaw } from "./git"
+import { queryClient } from "./query"
 
 export type Mode = "code" | "git-commit"
 export type Section = "mode" | "code-files" | "code-instruction"
@@ -83,11 +84,15 @@ export const modesConfig: Record<Mode, ModeConfig> = {
         return { path: file, content }
       })
 
-      const projectFiles = await listGitFilesRaw(process.cwd())
+      const projectFiles = await queryClient.fetchQuery(
+        getFilesQuery(process.cwd()),
+      )
       const files = (await Promise.all(promises)).filter((file) => file.content)
 
       const prompt = buildCodePrompt({
-        projectFiles,
+        projectFiles: projectFiles
+          .filter((file) => data.selectedFiles?.includes(file))
+          .join("\n"),
         files: files,
         instruction: data.instruction,
       })

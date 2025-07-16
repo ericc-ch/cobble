@@ -33,69 +33,6 @@ OUTPUT FORMAT
 3. Inside each code fence, you must provide the entire, complete content of the file, from the very first line to the very last line. Do not use placeholders, comments like `// ... rest of the code`, or provide only partial code snippets.
 </instructions>
 
-<examples>
-<example>
-  src/utils/formatters.js
-  ```javascript
-  export function formatDate(date) {
-    return new Intl.DateTimeFormat('en-US').format(date);
-  }
-  ```
-</example>
-
-<example>
-  src/types/user.ts
-  ```typescript
-  export interface User {
-    id: number;
-    name: string;
-    email?: string;
-  }
-  ```
-</example>
-
-<example>
-  public/index.html
-  ```html
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>My App</title>
-  </head>
-  <body>
-      <h1>Welcome to My App</h1>
-  </body>
-  </html>
-  ```
-</example>
-
-<example>
-  services/data_cleaner.py
-  ```python
-  import re
-
-  def remove_special_characters(text):
-      """Removes all non-alphanumeric characters from a string."""
-      return re.sub(r'[^A-Za-z0-9\\s]+', '', text)
-  ```
-</example>
-
-<example>
-  cmd/server/main.go
-  ```go
-  package main
-
-  import "fmt"
-
-  func main() {
-      fmt.Println("Hello, World!")
-  }
-  ```
-</example>
-</examples>
-
 {{context}}
 
 <user_query>
