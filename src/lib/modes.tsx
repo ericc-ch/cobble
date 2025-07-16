@@ -86,7 +86,7 @@ export const modesConfig: Record<Mode, ModeConfig> = {
       const projectFiles = await listGitFilesRaw(process.cwd())
       const files = (await Promise.all(promises)).filter((file) => file.content)
 
-      const prompt = await buildCodePrompt({
+      const prompt = buildCodePrompt({
         projectFiles,
         files: files,
         instruction: data.instruction,
