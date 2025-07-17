@@ -15,7 +15,7 @@ export const ModeSection = ({ isActive }: { isActive: boolean }) => {
 
   return (
     <Box flexDirection="column">
-      <Text color={isActive ? "yellow" : undefined}>[0] Mode:</Text>
+      <Text color={isActive ? "yellow" : undefined}>Mode:</Text>
       <SingleSelect
         borderColor={isActive ? "yellow" : undefined}
         borderStyle="round"

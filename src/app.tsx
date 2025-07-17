@@ -36,17 +36,29 @@ export const App = () => {
       const formData = getFormData(activeMode)
       currentModeConfig.onSubmit(formData ?? {})
     }
+
+    if (key.tab) {
+      const direction = key.shift ? -1 : 1
+      const numSections = currentModeConfig.sections.length
+      const totalItems = numSections + 1 // sections + mode selection
+
+      // `activeSectionIndex` is in range [-1, numSections - 1].
+      // Map to a 0-based index for modular arithmetic.
+      const currentItemIndex = activeSectionIndex + 1
+
+      let nextItemIndex = (currentItemIndex + direction) % totalItems
+      if (nextItemIndex < 0) {
+        nextItemIndex += totalItems
+      }
+
+      // Map back to `activeSectionIndex`'s range [-1, ...].
+      setActiveSectionIndex(nextItemIndex - 1)
+    }
   })
 
   useInput(
     (input, key) => {
-      if (input === "0") setActiveSectionIndex(-1)
       if (key.ctrl && input === "r") refreshFiles()
-
-      const sectionIndex = currentModeConfig.sections.findIndex(
-        (section) => section.shortcut === input,
-      )
-      if (sectionIndex !== -1) setActiveSectionIndex(sectionIndex)
     },
     { isActive: !isTextInputActive },
   )
@@ -70,7 +82,7 @@ export const App = () => {
 
       {currentModeConfig.sections.map((section, index) => {
         const Component = section.component
-        const title = `[${section.shortcut}] ${section.label}:`
+        const title = `${section.label}:`
 
         return (
           <Component

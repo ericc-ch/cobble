@@ -24,7 +24,6 @@ export interface SectionProps {
 
 export interface ModeSection {
   id: string
-  shortcut: string // The key the user presses to focus this section.
   label: string // The simple display name for the section.
   component: (props: SectionProps) => ReactNode
 }
@@ -43,13 +42,11 @@ export const modesConfig: Record<Mode, ModeConfig> = {
     sections: [
       {
         id: "files",
-        shortcut: "1",
         label: "Files",
         component: (props) => <FilesSection {...props} />,
       },
       {
         id: "instruction",
-        shortcut: "2",
         label: "Instruction",
         component: (props) => <InstructionSection {...props} />,
       },
@@ -110,7 +107,6 @@ export const modesConfig: Record<Mode, ModeConfig> = {
     sections: [
       {
         id: "instruction",
-        shortcut: "1",
         label: "Instruction",
         component: (props) => (
           <InstructionSection

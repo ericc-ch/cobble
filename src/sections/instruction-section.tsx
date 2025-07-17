@@ -20,9 +20,6 @@ export const InstructionSection = ({
   const instruction =
     useFormModeSelector(activeMode, (state) => state?.instruction) ?? ""
   const { setInstruction } = useFormActions()
-  const setActiveSectionIndex = useUIStore(
-    (state) => state.setActiveSectionIndex,
-  )
   const setIsTextInputActive = useUIStore((state) => state.setIsTextInputActive)
 
   // Sync active state with the global text input state
@@ -32,7 +29,6 @@ export const InstructionSection = ({
 
   useInput(
     (input, key) => {
-      if (key.escape) setActiveSectionIndex(-1)
       if (key.ctrl && input === "r")
         // This is stupid but useInput will fire before <TextInput> onChange
         // Therefore the reset gets replaced by onChange value
